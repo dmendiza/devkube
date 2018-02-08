@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scylla
+spec:
+  selector:
+    matchLabels:
+      app: scylla
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scylla
+    spec:
+      containers:
+      - name: scylla
+        image: scylladb/scylla:2.0.2
+        ports:
+        - containerPort: 9042
