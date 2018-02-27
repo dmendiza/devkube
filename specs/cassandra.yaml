@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra
+spec:
+  selector:
+    app: cassandra
+  ports:
+  - port: 9042
+    targetPort: 9042
+    protocol: TCP
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cassandra
+spec:
+  selector:
+    matchLabels:
+      app: cassandra
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cassandra
+    spec:
+      containers:
+      - name: cassandra
+        image: cassandra:2.1.14
+        ports:
+          - containerPort: 9042
+        env:
+          - name: CASSANDRA_BROADCAST_ADDRESS
+            value: 127.0.0.1
