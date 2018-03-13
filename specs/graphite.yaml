@@ -6,10 +6,20 @@ spec:
   selector:
     app: graphite
   ports:
-    - name: nginx
+    - name: graphite
       port: 80
       targetPort: 80
       protocol: TCP
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: statsd
+spec:
+  selector:
+    app: graphite
+  ports:
     - name: statsd
       port: 8125
       targetPort: 8125

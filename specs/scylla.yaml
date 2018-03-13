@@ -6,16 +6,17 @@ spec:
   selector:
     app: scylla
   ports:
-  - port: 9042
+  - port: 9044
     targetPort: 9042
     protocol: TCP
-  type: NodePort
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: scylla
 spec:
+  serviceName: scylla
   selector:
     matchLabels:
       app: scylla
@@ -27,7 +28,28 @@ spec:
     spec:
       containers:
       - name: scylla
-        image: scylladb/scylla:2.0.2
-        args: ["--broadcast-rpc-address", "localhost:9042"]
+        image: scylladb/scylla:2.1.0
+        args:
+        - "--broadcast-rpc-address"
+        - "localhost:9044"
+        - "--memory"
+        - "1G"
+        - "--overprovisioned"
+        - "1"
         ports:
+        - containerPort: 7000
+        - containerPort: 7001
         - containerPort: 9042
+        - containerPort: 9160
+        - containerPort: 10000
+        volumeMounts:
+        - name: scylladb
+          mountPath: /var/lib/scylla
+  volumeClaimTemplates:
+    - metadata:
+        name: scylladb
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
